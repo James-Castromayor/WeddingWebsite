@@ -42,7 +42,7 @@ else if (currentPage == "login")
             <div class="wedding-header">
                 <h1>Sarah & Michael</h1>
                 <p class="wedding-date">December 15, 2024</p>
-                <div class="decorative-line"></div>
+                <div class="decorative-line"></div><a href="C:\Users\JamesCastromayor\Downloads\wedding.html">C:\Users\JamesCastromayor\Downloads\wedding.html</a>
             </div>
             
             <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin" class="login-form">
@@ -50,14 +50,14 @@ else if (currentPage == "login")
                 
                 <div class="form-group">
                     <label for="username">Your Name</label>
-                    <InputText id="username" @bind-Value="loginModel.Username" 
+                    <Microsoft.AspNetCore.Components.Forms.InputText id="username" @bind-Value="loginModel.Username" 
                               class="form-control" placeholder="Enter your name" />
                     <ValidationMessage For="@(() => loginModel.Username)" />
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Wedding Password</label>
-                    <InputText id="password" @bind-Value="loginModel.Password" 
+                    <Microsoft.AspNetCore.Components.Forms.InputText id="password" @bind-Value="loginModel.Password" 
                               type="password" class="form-control" 
                               placeholder="Enter the wedding password" />
                     <ValidationMessage For="@(() => loginModel.Password)" />
@@ -83,7 +83,7 @@ else if (currentPage == "login")
 }
 else if (currentPage == "wedding")
 {
-    <WeddingWebsite.Components.WeddingMain GuestInfo="@guestInfo" />
+    <WeddingWebsite.Components.WeddingMain GuestInfo="@guestInfo" OnLogout="@BackToLogin" />
 }
 
 @code {

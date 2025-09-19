@@ -4,7 +4,7 @@
     <div class="container">
         <div class="rsvp-card">
             <h3><i class="fas fa-envelope-open-text"></i> RSVP</h3>
-            
+
             @if (!GuestInfo.HasRsvped)
             {
                 <EditForm Model="@rsvpModel" OnValidSubmit="@SubmitRsvp">
@@ -12,18 +12,18 @@
                         <label>Will you be attending?</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <InputRadio Name="attending" @bind-Value="rsvpModel.IsAttending" Value="true" />
+                                <InputRadio Name="attending" Value="true" @onchange="@((args) => rsvpModel.IsAttending = true)" />
                                 <span class="radio-custom"></span>
                                 Yes, I'll be there! 🎉
                             </label>
                             <label class="radio-label">
-                                <InputRadio Name="attending" @bind-Value="rsvpModel.IsAttending" Value="false" />
+                                <InputRadio Name="attending" Value="false" @onchange="@((args) => rsvpModel.IsAttending = false)" />
                                 <span class="radio-custom"></span>
                                 Sorry, can't make it 😢
                             </label>
                         </div>
                     </div>
-                    
+
                     @if (rsvpModel.IsAttending)
                     {
                         <div class="guest-details">
@@ -36,23 +36,23 @@
                                     <option value="4">4 Guests</option>
                                 </InputSelect>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="dietary">Dietary restrictions or allergies</label>
-                                <InputTextArea id="dietary" @bind-Value="rsvpModel.DietaryRestrictions" 
-                                             class="form-control" rows="3" 
-                                             placeholder="Please let us know about any dietary restrictions or allergies..." />
+                                <InputTextArea id="dietary" @bind-Value="rsvpModel.DietaryRestrictions"
+                                               class="form-control" rows="3"
+                                               placeholder="Please let us know about any dietary restrictions or allergies..." />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="requests">Special requests</label>
-                                <InputTextArea id="requests" @bind-Value="rsvpModel.SpecialRequests" 
-                                             class="form-control" rows="3" 
-                                             placeholder="Any special song requests or needs?" />
+                                <InputTextArea id="requests" @bind-Value="rsvpModel.SpecialRequests"
+                                               class="form-control" rows="3"
+                                               placeholder="Any special song requests or needs?" />
                             </div>
                         </div>
                     }
-                    
+
                     <button type="submit" class="btn-primary" disabled="@isSubmitting">
                         @if (isSubmitting)
                         {
@@ -72,7 +72,7 @@
                     <i class="fas fa-check-circle"></i>
                     <p style="font-size: 1.2rem; margin-bottom: 10px;">Thank you for your RSVP!</p>
                     <p>We can't wait to celebrate with you!</p>
-                    
+
                     @if (GuestInfo.Rsvp != null)
                     {
                         <div class="rsvp-details">
@@ -96,29 +96,29 @@
 @code {
     [Parameter] public GuestInfo GuestInfo { get; set; } = new();
     [Parameter] public EventCallback<GuestInfo> GuestInfoChanged { get; set; }
-    
+
     private RsvpModel rsvpModel = new();
     private bool isSubmitting = false;
-    
+
     private async Task SubmitRsvp()
     {
         isSubmitting = true;
-        
+
         try
         {
             // Simulate API call
             await Task.Delay(1000);
-            
+
             // Update guest info
             GuestInfo.HasRsvped = true;
             GuestInfo.Rsvp = new RsvpModel
-            {
-                IsAttending = rsvpModel.IsAttending,
-                GuestCount = rsvpModel.GuestCount,
-                DietaryRestrictions = rsvpModel.DietaryRestrictions,
-                SpecialRequests = rsvpModel.SpecialRequests
-            };
-            
+                {
+                    IsAttending = rsvpModel.IsAttending,
+                    GuestCount = rsvpModel.GuestCount,
+                    DietaryRestrictions = rsvpModel.DietaryRestrictions,
+                    SpecialRequests = rsvpModel.SpecialRequests
+                };
+
             await GuestInfoChanged.InvokeAsync(GuestInfo);
         }
         catch (Exception ex)

@@ -1,0 +1,51 @@
+﻿@using WeddingWebsite.Models
+@using WeddingWebsite.Services
+@inject IJSRuntime JSRuntime
+@inject ChatService ChatService
+@implements IDisposable
+
+<div class="wedding-page">
+    <!-- Header -->
+    <header class="wedding-header">
+        <div class="container">
+            <h1>Sarah & Michael</h1>
+            <p class="welcome-message">You are invited as <strong>@GuestInfo.Role</strong></p>
+            <button class="btn-logout" @onclick="Logout">Logout</button>
+        </div>
+    </header>
+    
+    <!-- Countdown Timer -->
+    <WeddingWebsite.Components.CountdownTimer WeddingDate="@weddingDate" />
+    
+    <!-- RSVP Section -->
+    <WeddingWebsite.Components.RsvpForm @bind-GuestInfo="GuestInfo" />
+    
+    <!-- Weather & Location -->
+    <WeddingWebsite.Components.WeatherWidget />
+    
+    <!-- AI Chat -->
+    <WeddingWebsite.Components.ChatBot ChatService="@ChatService" GuestName="@GuestInfo.Name" />
+</div>
+
+@code {
+    [Parameter] public GuestInfo GuestInfo { get; set; } = new();
+    [Parameter] public EventCallback OnLogout { get; set; }
+    
+    private DateTime weddingDate = new DateTime(2024, 12, 15, 18, 0, 0);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize any needed services
+        await Task.CompletedTask;
+    }
+    
+    private async Task Logout()
+    {
+        await OnLogout.InvokeAsync();
+    }
+    
+    public void Dispose()
+    {
+        // Cleanup if needed
+    }
+}

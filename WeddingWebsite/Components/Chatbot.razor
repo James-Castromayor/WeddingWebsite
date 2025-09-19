@@ -1,0 +1,106 @@
+﻿@using WeddingWebsite.Models
+@using WeddingWebsite.Services
+
+<section class="faq-section">
+    <div class="container">
+        <div class="faq-card">
+            <h3><i class="fas fa-comments"></i> Ask Sarah & Michael</h3>
+            <p>Have a question? Our AI assistant can help!</p>
+
+            <div class="chat-container">
+                <div class="chat-messages">
+                    @foreach (var message in messages)
+                    {
+                            <div class="message @(message.IsUser ? "user" : "ai")">
+                                <div class="message-content">
+                                @if (!message.IsUser)
+                                {
+                                            <i class="fas fa-robot"></i>
+                                }
+                                @message.Content
+                                </div>
+                                <div class="message-time">@message.Timestamp.ToString("HH:mm")</div>
+                            </div>
+                    }
+                </div>
+
+                <div class="chat-input">
+                    <input @bind="currentQuestion" @onkeypress="HandleKeyPress" 
+                           placeholder="Ask a question about the wedding..." 
+                           disabled="@isProcessing" />
+                    <button @onclick="SendQuestion" disabled="@(isProcessing || string.IsNullOrWhiteSpace(currentQuestion))">
+                        @if (isProcessing)
+                        {
+                                <span class="spinner"></span>
+                        }
+                        else
+                        {
+                                <i class="fas fa-paper-plane"></i>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public ChatService ChatService { get; set; } = default!;
+    [Parameter] public string GuestName { get; set; } = string.Empty;
+
+    private List<ChatMessage> messages = new();
+    private string currentQuestion = string.Empty;
+    private bool isProcessing = false;
+
+    protected override void OnInitialized()
+    {
+        messages.Add(new ChatMessage
+            {
+                Content = $"Hi {GuestName}! I'm here to help answer any questions about Sarah & Michael's wedding. What would you like to know?",
+                IsUser = false,
+                Timestamp = DateTime.Now
+            });
+    }
+
+    private async Task SendQuestion()
+    {
+        if (string.IsNullOrWhiteSpace(currentQuestion) || isProcessing)
+            return;
+
+        var question = currentQuestion.Trim();
+        currentQuestion = string.Empty;
+
+        // Add user message
+        messages.Add(new ChatMessage
+            {
+                Content = question,
+                IsUser = true,
+                Timestamp = DateTime.Now
+            });
+
+        isProcessing = true;
+        StateHasChanged();
+
+        // Get AI response
+        await Task.Delay(1000); // Simulate processing
+        var response = await ChatService.GetResponseAsync(question, GuestName);
+
+        messages.Add(new ChatMessage
+            {
+                Content = response,
+                IsUser = false,
+                Timestamp = DateTime.Now
+            });
+
+        isProcessing = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendQuestion();
+        }
+    }
+}

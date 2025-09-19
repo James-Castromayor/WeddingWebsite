@@ -1,0 +1,65 @@
+﻿@implements IDisposable
+
+<section class="countdown-section">
+    <div class="container">
+        <h2>Until We Say "I Do"</h2>
+        <div class="countdown-timer">
+            <div class="time-unit">
+                <span class="number">@days</span>
+                <span class="label">Days</span>
+            </div>
+            <div class="time-unit">
+                <span class="number">@hours</span>
+                <span class="label">Hours</span>
+            </div>
+            <div class="time-unit">
+                <span class="number">@minutes</span>
+                <span class="label">Minutes</span>
+            </div>
+            <div class="time-unit">
+                <span class="number">@seconds</span>
+                <span class="label">Seconds</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public DateTime WeddingDate { get; set; }
+
+    private int days = 0;
+    private int hours = 0;
+    private int minutes = 0;
+    private int seconds = 0;
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        UpdateCountdown();
+        timer = new Timer(UpdateCountdown, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+    }
+
+    private void UpdateCountdown(object? state = null)
+    {
+        var timeLeft = WeddingDate - DateTime.Now;
+
+        if (timeLeft.TotalSeconds > 0)
+        {
+            days = timeLeft.Days;
+            hours = timeLeft.Hours;
+            minutes = timeLeft.Minutes;
+            seconds = timeLeft.Seconds;
+        }
+        else
+        {
+            days = hours = minutes = seconds = 0;
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

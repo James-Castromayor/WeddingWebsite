@@ -1,0 +1,165 @@
+﻿@page "/"
+@using WeddingWebsite.Models
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+@using Microsoft.JSInterop
+@using WeddingWebsite.Models
+@using WeddingWebsite.Services
+
+
+@using Microsoft.JSInterop
+@using System.Timers
+
+<PageTitle>Sarah & Michael's Wedding</PageTitle>
+
+@if (currentPage == "landing")
+{
+    <!-- Envelope Landing Page -->
+    <div class="envelope-container">
+        <div class="envelope-wrapper" @onclick="OpenEnvelope">
+            <div class="envelope @(isOpening ? "opening" : "")">
+                <div class="envelope-back"></div>
+                <div class="envelope-flap"></div>
+                <div class="envelope-front">
+                    <div class="wax-seal">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+                <div class="open-instruction @(isOpening ? "fade-out" : "")">
+                    <p>You're Invited!</p>
+                    <small>Click to open</small>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (currentPage == "login")
+{
+    <!-- Login Form -->
+    <div class="login-page">
+        <div class="login-form-container">
+            <div class="wedding-header">
+                <h1>Sarah & Michael</h1>
+                <p class="wedding-date">December 15, 2024</p>
+                <div class="decorative-line"></div>
+            </div>
+            
+            <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin" class="login-form">
+                <DataAnnotationsValidator />
+                
+                <div class="form-group">
+                    <label for="username">Your Name</label>
+                    <InputText id="username" @bind-Value="loginModel.Username" 
+                              class="form-control" placeholder="Enter your name" />
+                    <ValidationMessage For="@(() => loginModel.Username)" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Wedding Password</label>
+                    <InputText id="password" @bind-Value="loginModel.Password" 
+                              type="password" class="form-control" 
+                              placeholder="Enter the wedding password" />
+                    <ValidationMessage For="@(() => loginModel.Password)" />
+                </div>
+                
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger">
+                        @errorMessage
+                    </div>
+                }
+                
+                <button type="submit" class="btn-wedding" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner"></span>
+                    }
+                    Enter Our Wedding
+                </button>
+            </EditForm>
+        </div>
+    </div>
+}
+else if (currentPage == "wedding")
+{
+    <WeddingWebsite.Components.WeddingMain GuestInfo="@guestInfo" />
+}
+
+@code {
+    private string currentPage = "landing";
+    private bool isOpening = false;
+    private bool isLoading = false;
+    private string errorMessage = string.Empty;
+    private LoginModel loginModel = new();
+    private GuestInfo guestInfo = new();
+    
+    private async Task OpenEnvelope()
+    {
+        if (currentPage != "landing") return;
+        
+        isOpening = true;
+        StateHasChanged();
+        
+        await Task.Delay(1500); // Wait for animation
+        
+        currentPage = "login";
+        isOpening = false;
+        StateHasChanged();
+    }
+    
+    private async Task HandleLogin()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            // Simple demo authentication (replace with real auth later)
+            if (string.IsNullOrWhiteSpace(loginModel.Username))
+            {
+                errorMessage = "Please enter your name";
+                return;
+            }
+            
+            if (loginModel.Password != "wedding2024")
+            {
+                errorMessage = "Invalid password. Try 'wedding2024' for demo.";
+                return;
+            }
+            
+            // Simulate role assignment
+            var roles = new[] { "Best Man", "Maid of Honor", "Family", "Close Friend", "Wedding Party" };
+            var random = new Random();
+            
+            guestInfo = new GuestInfo
+            {
+                Name = loginModel.Username,
+                Role = roles[random.Next(roles.Length)],
+                HasRsvped = false
+            };
+            
+            await Task.Delay(500); // Simulate processing
+            
+            currentPage = "wedding";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Something went wrong. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+    public void BackToLogin()
+    {
+        currentPage = "landing";
+        loginModel = new();
+        guestInfo = new();
+        errorMessage = string.Empty;
+        StateHasChanged();
+    }
+}

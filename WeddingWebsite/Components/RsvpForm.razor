@@ -1,0 +1,134 @@
+﻿@using WeddingWebsite.Models
+
+<section class="rsvp-section">
+    <div class="container">
+        <div class="rsvp-card">
+            <h3><i class="fas fa-envelope-open-text"></i> RSVP</h3>
+            
+            @if (!GuestInfo.HasRsvped)
+            {
+                <EditForm Model="@rsvpModel" OnValidSubmit="@SubmitRsvp">
+                    <div class="form-group">
+                        <label>Will you be attending?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <InputRadio Name="attending" @bind-Value="rsvpModel.IsAttending" Value="true" />
+                                <span class="radio-custom"></span>
+                                Yes, I'll be there! 🎉
+                            </label>
+                            <label class="radio-label">
+                                <InputRadio Name="attending" @bind-Value="rsvpModel.IsAttending" Value="false" />
+                                <span class="radio-custom"></span>
+                                Sorry, can't make it 😢
+                            </label>
+                        </div>
+                    </div>
+                    
+                    @if (rsvpModel.IsAttending)
+                    {
+                        <div class="guest-details">
+                            <div class="form-group">
+                                <label for="guestCount">Number of guests (including yourself)</label>
+                                <InputSelect id="guestCount" @bind-Value="rsvpModel.GuestCount" class="form-control">
+                                    <option value="1">1 Guest</option>
+                                    <option value="2">2 Guests</option>
+                                    <option value="3">3 Guests</option>
+                                    <option value="4">4 Guests</option>
+                                </InputSelect>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="dietary">Dietary restrictions or allergies</label>
+                                <InputTextArea id="dietary" @bind-Value="rsvpModel.DietaryRestrictions" 
+                                             class="form-control" rows="3" 
+                                             placeholder="Please let us know about any dietary restrictions or allergies..." />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="requests">Special requests</label>
+                                <InputTextArea id="requests" @bind-Value="rsvpModel.SpecialRequests" 
+                                             class="form-control" rows="3" 
+                                             placeholder="Any special song requests or needs?" />
+                            </div>
+                        </div>
+                    }
+                    
+                    <button type="submit" class="btn-primary" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner"></span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-paper-plane"></i>
+                        }
+                        Submit RSVP
+                    </button>
+                </EditForm>
+            }
+            else
+            {
+                <div class="rsvp-confirmed">
+                    <i class="fas fa-check-circle"></i>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">Thank you for your RSVP!</p>
+                    <p>We can't wait to celebrate with you!</p>
+                    
+                    @if (GuestInfo.Rsvp != null)
+                    {
+                        <div class="rsvp-details">
+                            <p><strong>Attending:</strong> @(GuestInfo.Rsvp.IsAttending ? "Yes" : "No")</p>
+                            @if (GuestInfo.Rsvp.IsAttending)
+                            {
+                                <p><strong>Guests:</strong> @GuestInfo.Rsvp.GuestCount</p>
+                                @if (!string.IsNullOrEmpty(GuestInfo.Rsvp.DietaryRestrictions))
+                                {
+                                    <p><strong>Dietary:</strong> @GuestInfo.Rsvp.DietaryRestrictions</p>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public GuestInfo GuestInfo { get; set; } = new();
+    [Parameter] public EventCallback<GuestInfo> GuestInfoChanged { get; set; }
+    
+    private RsvpModel rsvpModel = new();
+    private bool isSubmitting = false;
+    
+    private async Task SubmitRsvp()
+    {
+        isSubmitting = true;
+        
+        try
+        {
+            // Simulate API call
+            await Task.Delay(1000);
+            
+            // Update guest info
+            GuestInfo.HasRsvped = true;
+            GuestInfo.Rsvp = new RsvpModel
+            {
+                IsAttending = rsvpModel.IsAttending,
+                GuestCount = rsvpModel.GuestCount,
+                DietaryRestrictions = rsvpModel.DietaryRestrictions,
+                SpecialRequests = rsvpModel.SpecialRequests
+            };
+            
+            await GuestInfoChanged.InvokeAsync(GuestInfo);
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could add error message display
+            Console.WriteLine($"RSVP Error: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

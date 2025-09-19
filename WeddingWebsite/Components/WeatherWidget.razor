@@ -1,0 +1,43 @@
+﻿@using WeddingWebsite.Models
+
+<section class="info-section">
+    <div class="container">
+        <div class="info-grid">
+            <div class="info-card">
+                <h4><i class="fas fa-cloud-sun"></i> Weather Forecast</h4>
+                <div class="weather-info">
+                    <div class="weather-display">
+                        <i class="fas fa-sun weather-icon"></i>
+                        <div class="weather-details">
+                            <span class="temperature">72°F</span>
+                            <span class="condition">Sunny & Perfect!</span>
+                            <small class="forecast-note">Perfect weather for our special day</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4><i class="fas fa-map-marker-alt"></i> Venue Location</h4>
+                <div class="location-info">
+                    <p><strong>The Grand Ballroom</strong></p>
+                    <p>123 Wedding Lane<br>San Francisco, CA 94102</p>
+                    <p class="distance">📍 12.5 miles from your location</p>
+                    <button class="btn-secondary" @onclick="GetDirections">
+                        <i class="fas fa-directions"></i>
+                        Get Directions
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private void GetDirections()
+    {
+        var venueAddress = "123 Wedding Lane, San Francisco, CA 94102";
+        var mapsUrl = $"https://maps.google.com/maps?q={Uri.EscapeDataString(venueAddress)}";
+        // This will require IJSRuntime injection when we add real JS interop
+    }
+}

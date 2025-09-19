@@ -20,7 +20,7 @@ namespace WeddingWebsite.Services
             if (lowerQuestion.Contains("food") || lowerQuestion.Contains("dinner") || lowerQuestion.Contains("menu"))
                 return Task.FromResult("We'll have a delicious buffet dinner with vegetarian and gluten-free options! 🍽️");
 
-            return Task.FromResult($"Hi {guestName}! For specific details, please contact Sarah at (555) 123-4567. We're happy to help! 📞");
+            return Task.FromResult($"Hi {guestName}! For specific details, please contact Eurish & James. We're happy to help! 📞");
         }
     }
 }
